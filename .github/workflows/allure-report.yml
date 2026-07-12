@@ -3,7 +3,7 @@ name: ShopKart Allure Report
 on:
   push:
     branches:
-      - jyothsna_Week06_Gate6_Assessment
+      - jyotshna_Week06_Gate6_Assessment
 
 permissions:
   contents: write
