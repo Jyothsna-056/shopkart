@@ -3,66 +3,78 @@ name: ShopKart Allure Report
 on:
   push:
     branches:
-      - jyotshna_Week06_Gate6_Assessment
+      - jyothsna_week06_gate6
 
 permissions:
   contents: write
 
 
-
 jobs:
   allure-report:
-
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Java
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 22
+          java-version: '22'
           cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Check Gradle
-        run: gradle -v
-
-      - name: Run Reporting Tests
+      - name: Run reporting task
         working-directory: Shopkart_Project
         run: gradle reporting --no-configuration-cache
 
-      - name: Copy Allure Environment
+      - name: Copy Allure environment
         if: always()
         run: |
           mkdir -p Shopkart_Project/build/allure-results
           cp Shopkart_Project/src/test/resources/environment.properties \
-             Shopkart_Project/build/allure-results/environment.properties
+            Shopkart_Project/build/allure-results/environment.properties
 
-      - name: Checkout gh-pages branch
+      - name: Create gh-pages branch if it does not exist
+        if: always()
+        run: |
+          git fetch origin
+
+          if ! git ls-remote --exit-code --heads origin gh-pages; then
+            git checkout --orphan gh-pages
+            git rm -rf . || true
+            echo "# GitHub Pages" > README.md
+            git add README.md
+            git -c user.name="github-actions" \
+                -c user.email="github-actions@github.com" \
+                commit -m "Initialize gh-pages"
+            git push origin gh-pages
+          fi
+
+          git checkout ${{ github.ref_name }}
+
+      - name: Checkout gh-pages
         if: always()
         uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages
 
-      - name: Generate Allure Report
+      - name: Generate Allure report
         if: always()
         uses: simple-elf/allure-report-action@master
         with:
-          allure_results: Shopkart_Project/build/allure-results
-          allure_report: allure-report
           gh_pages: gh-pages
           allure_history: allure-history
+          allure_results: Shopkart_Project/build/allure-results
+          allure_report: allure-report
 
-      - name: Deploy to GitHub Pages
+      - name: Publish report
         if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
