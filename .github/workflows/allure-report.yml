@@ -74,6 +74,7 @@ jobs:
           allure_results: Shopkart_Project/build/allure-results
           allure_report: allure-report
 
+
       - name: Publish report
         if: always()
         uses: peaceiris/actions-gh-pages@v4
