@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @Epic("Framework Hardening")
 @Feature("Reporting")
-@Owner("Saiteja")
+
 public class ReportingConfigurationTest {
 
     @Test
